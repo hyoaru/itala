@@ -2,6 +2,8 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import "@fontsource-variable/dm-sans";
+import "@fontsource-variable/space-grotesk";
 import "./globals.css";
 
 const router = createRouter({ routeTree });
