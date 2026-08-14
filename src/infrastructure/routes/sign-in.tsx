@@ -2,7 +2,6 @@ import type { IdentityProviderInvalidCredentialsError } from "@/application/port
 import { SignIn } from "@/application/use-cases";
 import { useDependencies } from "@/infrastructure/dependencies/context";
 import { getFieldError } from "@/infrastructure/forms";
-import { strongPasswordSchema } from "@/infrastructure/validators";
 import {
   Button,
   FieldError,

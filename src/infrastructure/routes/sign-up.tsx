@@ -2,7 +2,7 @@ import { IdentityProviderError } from "@/application/ports/identity-provider";
 import { SignUp } from "@/application/use-cases";
 import { useDependencies } from "@/infrastructure/dependencies/context";
 import { getFieldError } from "@/infrastructure/forms";
-import { strongPasswordSchema } from "@/infrastructure/validators";
+import { passwordSchema } from "@/infrastructure/validators";
 import {
   Button,
   FieldError,
@@ -46,7 +46,7 @@ function RouteComponent() {
     validators: {
       onChange: z.object({
         email: z.email(),
-        password: strongPasswordSchema,
+        password: passwordSchema,
       }),
     },
     onSubmit: async ({ value }) => {
