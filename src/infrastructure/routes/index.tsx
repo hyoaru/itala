@@ -1,5 +1,4 @@
-import { Button } from "@heroui/react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { NotebookPen } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -9,10 +8,10 @@ export const Route = createFileRoute("/")({
 function RouteComponent() {
   return (
     <>
-      <div className="flex w-full flex-col items-center justify-end gap-4 py-8">
+      <div className="mt-auto flex w-full flex-col items-center gap-4 py-8">
         <div className="flex w-full flex-col items-center gap-2">
           <span className="inline-flex items-center gap-1 text-4xl">
-            <NotebookPen className="bg-accent h-[1em] w-[1em] rounded-xl p-1" />
+            <NotebookPen className="bg-accent h-[1em] w-[1em] rounded-xl p-0.5" />
             <span className="font-heading font-semibold">ITALA</span>
           </span>
           <p className="font-heading text-xl font-medium">
@@ -23,10 +22,12 @@ function RouteComponent() {
           </p>
         </div>
         <div className="flex w-full flex-col items-center gap-2">
-          <Button className="w-full">Create an account</Button>
-          <Button variant="secondary" className="w-full">
+          <Link to="/" className="button button--primary w-full">
+            Create an account
+          </Link>
+          <Link to="/sign-in" className="button button--secondary w-full">
             I already have an account
-          </Button>
+          </Link>
         </div>
       </div>
     </>

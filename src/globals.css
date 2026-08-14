@@ -21,4 +21,12 @@
   .button--secondary {
     @apply bg-accent-soft text-foreground;
   }
+
+  .label {
+    @apply text-muted text-xs;
+  }
+
+  .input {
+    @apply py-3 text-sm;
+  }
 }
