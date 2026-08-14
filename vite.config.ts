@@ -1,6 +1,7 @@
 import babel from "@rolldown/plugin-babel";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 // https://vite.dev/config/
@@ -12,5 +13,6 @@ export default defineConfig({
     }),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
+    tailwindcss(),
   ],
 });
