@@ -22,7 +22,7 @@ function RouteComponent() {
           </p>
         </div>
         <div className="flex w-full flex-col items-center gap-2">
-          <Link to="/" className="button button--primary w-full">
+          <Link to="/sign-up" className="button button--primary w-full">
             Create an account
           </Link>
           <Link to="/sign-in" className="button button--secondary w-full">
