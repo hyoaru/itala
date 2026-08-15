@@ -1,7 +1,9 @@
 import {
+  SendVerification,
   SignIn,
   SignUp,
   Verify,
+  type SendVerificationRequest,
   type SignInRequest,
   type SignUpRequest,
   type VerifyRequest,
@@ -21,7 +23,7 @@ const identityProvider = new DecoratedIdentityProvider(
 export const identityActions = {
   signIn: () =>
     mutationOptions({
-      mutationKey: [baseKey, "signIn"],
+      mutationKey: [baseKey, "sign_in"],
       mutationFn: (request: SignInRequest) =>
         new SignIn(identityProvider, {
           email: request.email,
@@ -30,7 +32,7 @@ export const identityActions = {
     }),
   signUp: () =>
     mutationOptions({
-      mutationKey: [baseKey, "signUp"],
+      mutationKey: [baseKey, "sign_up"],
       mutationFn: (request: SignUpRequest) =>
         new SignUp(identityProvider, {
           email: request.email,
@@ -46,6 +48,14 @@ export const identityActions = {
         new Verify(identityProvider, {
           email: request.email,
           code: request.code,
+        }).execute(),
+    }),
+  sendVerification: () =>
+    mutationOptions({
+      mutationKey: [baseKey, "send_verification"],
+      mutationFn: (request: SendVerificationRequest) =>
+        new SendVerification(identityProvider, {
+          email: request.email,
         }).execute(),
     }),
 };

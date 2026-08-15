@@ -28,6 +28,9 @@ function RouteComponent() {
   const navigate = useNavigate();
   const email = sessionStorage.getItem("VERIFICATION_EMAIL")!;
   const verifyMutation = useMutation(identityActions.verify());
+  const sendVerificationMutation = useMutation(
+    identityActions.sendVerification(),
+  );
 
   const form = useAppForm({
     defaultValues: {
@@ -55,6 +58,19 @@ function RouteComponent() {
       }
     },
   });
+
+  const onResend = async () => {
+    try {
+      await sendVerificationMutation.mutateAsync({
+        email: email,
+      });
+      toast("Email verification sent", { variant: "success" });
+    } catch {
+      toast("An unexpected error has occured", {
+        variant: "danger",
+      });
+    }
+  };
 
   return (
     <>
@@ -112,9 +128,12 @@ function RouteComponent() {
                   </field.InputOTP>
                   <p className="text-muted text-sm">
                     Didn't receive a code?{" "}
-                    <span className="text-foreground font-medium underline">
+                    <button
+                      onClick={onResend}
+                      className="text-foreground font-medium underline"
+                    >
                       Resend
-                    </span>
+                    </button>
                   </p>
                 </div>
               );
