@@ -42,14 +42,14 @@ export class LoggingIdentityProvider implements IdentityProvider {
     }
   }
 
-  public async verify(code: string): Promise<void> {
+  public async verify(email: string, code: string): Promise<void> {
     try {
-      logger.debug("Verifying email");
-      const result = await this.inner.verify(code);
-      logger.info("Email verification successful");
+      logger.debug("Verifying email", { email });
+      const result = await this.inner.verify(email, code);
+      logger.info("Email verification successful", { email });
       return result;
     } catch (error) {
-      logger.error("Email verification failed");
+      logger.error("Email verification failed", { email });
       throw error;
     }
   }

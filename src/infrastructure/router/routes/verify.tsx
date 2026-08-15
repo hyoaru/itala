@@ -3,7 +3,7 @@ import { getFieldError } from "@/infrastructure/forms";
 import { Button, Form, InputOTP, toast } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
 import { z } from "zod";
 
@@ -25,6 +25,8 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
+  const email = sessionStorage.getItem("VERIFICATION_EMAIL")!;
   const verifyMutation = useMutation(identityActions.verify());
 
   const form = useAppForm({
@@ -39,12 +41,13 @@ function RouteComponent() {
     onSubmit: async ({ value }) => {
       try {
         await verifyMutation.mutateAsync({
+          email: email,
           code: value.code,
         });
 
         form.reset();
-
         toast("Email verified successfully!", { variant: "success" });
+        navigate({ to: "/" });
       } catch {
         toast("An unexpected error has occured", {
           variant: "danger",
@@ -72,7 +75,7 @@ function RouteComponent() {
             Confirm your email
           </p>
           <p className="text-muted text-sm">
-            We sent a 6-digit confirmation code to [email]
+            We sent a 6-digit confirmation code to {email}
           </p>
         </div>
         <Form

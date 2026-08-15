@@ -1,7 +1,3 @@
-import {
-  IdentityProviderInvalidCredentialsError,
-  IdentityProviderError,
-} from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
 import { passwordSchema } from "@/infrastructure/validators";
@@ -16,7 +12,7 @@ import {
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
 import { z } from "zod";
 
@@ -38,6 +34,7 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const signUpMutation = useMutation(identityActions.signUp());
 
   const form = useAppForm({
@@ -64,9 +61,12 @@ function RouteComponent() {
           password: value.password,
         });
 
-        // form.reset();
-
-        toast(`Welcome aboard, ${value.firstName}!`, { variant: "success" });
+        form.reset();
+        sessionStorage.setItem("VERIFICATION_EMAIL", value.email);
+        toast(`Welcome aboard, ${value.firstName}! Verify your email`, {
+          variant: "success",
+        });
+        navigate({ to: "/verify" });
       } catch {
         toast("An unexpected error has occured", {
           variant: "danger",

@@ -43,6 +43,9 @@ export const identityActions = {
     mutationOptions({
       mutationKey: [baseKey, "verify"],
       mutationFn: (request: VerifyRequest) =>
-        new Verify(identityProvider, { code: request.code }).execute(),
+        new Verify(identityProvider, {
+          email: request.email,
+          code: request.code,
+        }).execute(),
     }),
 };

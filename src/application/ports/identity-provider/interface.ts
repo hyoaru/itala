@@ -8,5 +8,5 @@ export interface IdentityProvider {
 
   signIn(email: string, password: string): Promise<void>;
 
-  verify(code: string): Promise<void>;
+  verify(email: string, code: string): Promise<void>;
 }

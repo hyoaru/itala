@@ -12,6 +12,6 @@ export class Verify implements UseCase<void> {
   }
 
   public async execute(): Promise<void> {
-    await this.idp.verify(this.request.code);
+    await this.idp.verify(this.request.email, this.request.code);
   }
 }

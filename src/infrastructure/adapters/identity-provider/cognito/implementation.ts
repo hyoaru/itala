@@ -1,6 +1,7 @@
 import type { IdentityProvider } from "@/application/ports/identity-provider";
 import {
   CognitoIdentityProviderClient,
+  ConfirmSignUpCommand,
   InitiateAuthCommand,
   SignUpCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
@@ -49,7 +50,13 @@ export class CognitoIdentityProvider implements IdentityProvider {
     );
   }
 
-  public async verify(_code: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  public async verify(email: string, code: string): Promise<void> {
+    await this.cognitoClient.send(
+      new ConfirmSignUpCommand({
+        ClientId: this.cognitoClientId,
+        Username: email,
+        ConfirmationCode: code,
+      }),
+    );
   }
 }
