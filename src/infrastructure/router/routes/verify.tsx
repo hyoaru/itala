@@ -55,6 +55,7 @@ function RouteComponent() {
         });
 
         form.reset();
+        sessionStorage.removeItem("VERIFICATION_EMAIL");
         toast("Email verified successfully!", { variant: "success" });
         navigate({ to: "/" });
       } catch (error) {
