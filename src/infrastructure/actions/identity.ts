@@ -5,7 +5,7 @@ import {
   type SignInRequest,
   type SignUpRequest,
   type VerifyRequest,
-} from "@/application/use-cases";
+} from "@/application/use-cases/identity";
 import { mutationOptions } from "@tanstack/react-query";
 import {
   DecoratedIdentityProvider,
