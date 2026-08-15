@@ -1,3 +1,7 @@
+import {
+  IdentityProviderInvalidCredentialsError,
+  IdentityProviderError,
+} from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
 import { passwordSchema } from "@/infrastructure/validators";
@@ -8,6 +12,7 @@ import {
   Input,
   Label,
   TextField,
+  toast,
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
@@ -51,12 +56,22 @@ function RouteComponent() {
       }),
     },
     onSubmit: async ({ value }) => {
-      await signUpMutation.mutateAsync({
-        email: value.email,
-        firstName: value.firstName,
-        lastName: value.lastName,
-        password: value.password,
-      });
+      try {
+        await signUpMutation.mutateAsync({
+          email: value.email,
+          firstName: value.firstName,
+          lastName: value.lastName,
+          password: value.password,
+        });
+
+        // form.reset();
+
+        toast(`Welcome aboard, ${value.firstName}!`, { variant: "success" });
+      } catch {
+        toast("An unexpected error has occured", {
+          variant: "danger",
+        });
+      }
     },
   });
 
