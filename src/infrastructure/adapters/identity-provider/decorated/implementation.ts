@@ -28,4 +28,16 @@ export class DecoratedIdentityProvider implements IdentityProvider {
   public async sendVerification(email: string): Promise<void> {
     return await this.inner.sendVerification(email);
   }
+
+  public async requestPasswordReset(email: string): Promise<void> {
+    return await this.inner.requestPasswordReset(email);
+  }
+
+  public async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<void> {
+    return await this.inner.resetPassword(email, code, newPassword);
+  }
 }

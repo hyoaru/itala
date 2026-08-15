@@ -1,8 +1,7 @@
 import {
+  IdentityProviderCodeDeliveryFailureError,
   IdentityProviderError,
-  IdentityProviderInvalidCredentialsError,
-  IdentityProviderPasswordResetRequiredError,
-  IdentityProviderUserNotConfirmedError,
+  IdentityProviderUserNotFoundError,
 } from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
@@ -17,11 +16,11 @@ import {
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
 import { z } from "zod";
 
-export const Route = createFileRoute("/sign-in")({
+export const Route = createFileRoute("/forgot-password")({
   component: RouteComponent,
 });
 
@@ -39,41 +38,35 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
-  const signInMutation = useMutation(identityActions.signIn());
+  const navigate = useNavigate();
+  const requestPasswordResetMutation = useMutation(
+    identityActions.requestPasswordReset(),
+  );
 
   const form = useAppForm({
     defaultValues: {
       email: "",
-      password: "",
     },
     validators: {
       onChange: z.object({
         email: z.email(),
-        password: z.string(),
       }),
     },
     onSubmit: async ({ value }) => {
       try {
-        await signInMutation.mutateAsync({
+        await requestPasswordResetMutation.mutateAsync({
           email: value.email,
-          password: value.password,
         });
 
         form.reset();
-
-        toast("Glad to have you back, [Name]", { variant: "success" });
+        sessionStorage.setItem("PASSWORD_RESET_EMAIL", value.email);
+        toast("Password reset code sent", { variant: "success" });
+        navigate({ to: "/reset-password" });
       } catch (error) {
-        if (error instanceof IdentityProviderInvalidCredentialsError) {
-          toast("Incorrect email or password", { variant: "danger" });
-        } else if (error instanceof IdentityProviderUserNotConfirmedError) {
-          sessionStorage.setItem("VERIFICATION_EMAIL", value.email);
-          toast("Please verify your email before signing in", {
-            variant: "danger",
-          });
-        } else if (
-          error instanceof IdentityProviderPasswordResetRequiredError
-        ) {
-          toast("A password reset is required for this account", {
+        if (error instanceof IdentityProviderUserNotFoundError) {
+          toast("No account found for this email", { variant: "danger" });
+        } else if (error instanceof IdentityProviderCodeDeliveryFailureError) {
+          toast("Could not send the code. Please try again.", {
             variant: "danger",
           });
         } else if (error instanceof IdentityProviderError) {
@@ -94,7 +87,10 @@ function RouteComponent() {
       <div className="w-full space-y-8">
         <div className="relative flex w-full items-center justify-center text-3xl">
           <div className="absolute flex w-full justify-start">
-            <Link to="/" className="button button--icon button--secondary">
+            <Link
+              to="/sign-in"
+              className="button button--icon button--secondary"
+            >
               <ArrowLeft className="" />
             </Link>
           </div>
@@ -104,9 +100,11 @@ function RouteComponent() {
           </span>
         </div>
         <div className="flex flex-col items-center">
-          <p className="font-heading text-2xl font-medium">Welcome back</p>
+          <p className="font-heading text-2xl font-medium">
+            Reset your password
+          </p>
           <p className="text-muted text-sm">
-            Sign in to pick up where you left off.
+            Enter your email and we'll send you a reset code.
           </p>
         </div>
         <Form
@@ -137,38 +135,9 @@ function RouteComponent() {
             }}
           </form.AppField>
 
-          <form.AppField name="password">
-            {(field) => {
-              const { isInvalid, errorMessage } = getFieldError(field);
-              return (
-                <field.TextField isInvalid={isInvalid}>
-                  <Label>Password</Label>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    type="password"
-                    variant="secondary"
-                    placeholder="Enter your password"
-                  />
-                  <FieldError>{errorMessage}</FieldError>
-                </field.TextField>
-              );
-            }}
-          </form.AppField>
-
-          <p className="text-muted text-center text-sm">
-            Trouble signing in?{" "}
-            <Link className="font-medium underline" to="/forgot-password">
-              Reset password
-            </Link>
-          </p>
-
           <form.AppForm>
             <form.Button type="submit" className="w-full">
-              Continue to Workspace
+              Send reset code
             </form.Button>
           </form.AppForm>
         </Form>

@@ -16,8 +16,10 @@ import {
   CodeDeliveryFailureException,
   CodeMismatchException,
   CognitoIdentityProviderClient,
+  ConfirmForgotPasswordCommand,
   ConfirmSignUpCommand,
   ExpiredCodeException,
+  ForgotPasswordCommand,
   InitiateAuthCommand,
   InvalidEmailRoleAccessPolicyException,
   InvalidParameterException,
@@ -179,6 +181,73 @@ export class CognitoIdentityProvider implements IdentityProvider {
         throw new IdentityProviderCodeDeliveryFailureError(email, {
           cause: error,
         });
+      }
+      if (error instanceof UserNotFoundException) {
+        throw new IdentityProviderUserNotFoundError(email, { cause: error });
+      }
+      const message = error instanceof Error ? error.message : String(error);
+      throw new IdentityProviderError(`Identity provider error: ${message}`, {
+        cause: error,
+      });
+    }
+  }
+
+  public async requestPasswordReset(email: string): Promise<void> {
+    try {
+      await this.cognitoClient.send(
+        new ForgotPasswordCommand({
+          ClientId: this.cognitoClientId,
+          Username: email,
+        }),
+      );
+    } catch (error) {
+      if (error instanceof IdentityProviderError) {
+        throw error;
+      }
+      if (error instanceof UserNotFoundException) {
+        throw new IdentityProviderUserNotFoundError(email, { cause: error });
+      }
+      if (
+        error instanceof CodeDeliveryFailureException ||
+        error instanceof LimitExceededException
+      ) {
+        throw new IdentityProviderCodeDeliveryFailureError(email, {
+          cause: error,
+        });
+      }
+      const message = error instanceof Error ? error.message : String(error);
+      throw new IdentityProviderError(`Identity provider error: ${message}`, {
+        cause: error,
+      });
+    }
+  }
+
+  public async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<void> {
+    try {
+      await this.cognitoClient.send(
+        new ConfirmForgotPasswordCommand({
+          ClientId: this.cognitoClientId,
+          Username: email,
+          ConfirmationCode: code,
+          Password: newPassword,
+        }),
+      );
+    } catch (error) {
+      if (error instanceof IdentityProviderError) {
+        throw error;
+      }
+      if (
+        error instanceof CodeMismatchException ||
+        error instanceof ExpiredCodeException
+      ) {
+        throw new IdentityProviderInvalidCodeError({ cause: error });
+      }
+      if (error instanceof InvalidPasswordException) {
+        throw new IdentityProviderInvalidPasswordError({ cause: error });
       }
       if (error instanceof UserNotFoundException) {
         throw new IdentityProviderUserNotFoundError(email, { cause: error });

@@ -11,4 +11,12 @@ export interface IdentityProvider {
   verify(email: string, code: string): Promise<void>;
 
   sendVerification(email: string): Promise<void>;
+
+  requestPasswordReset(email: string): Promise<void>;
+
+  resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<void>;
 }

@@ -1,8 +1,12 @@
 import {
+  RequestPasswordReset,
+  ResetPassword,
   SendVerification,
   SignIn,
   SignUp,
   Verify,
+  type RequestPasswordResetRequest,
+  type ResetPasswordRequest,
   type SendVerificationRequest,
   type SignInRequest,
   type SignUpRequest,
@@ -56,6 +60,24 @@ export const identityActions = {
       mutationFn: (request: SendVerificationRequest) =>
         new SendVerification(identityProvider, {
           email: request.email,
+        }).execute(),
+    }),
+  requestPasswordReset: () =>
+    mutationOptions({
+      mutationKey: [baseKey, "request_password_reset"],
+      mutationFn: (request: RequestPasswordResetRequest) =>
+        new RequestPasswordReset(identityProvider, {
+          email: request.email,
+        }).execute(),
+    }),
+  resetPassword: () =>
+    mutationOptions({
+      mutationKey: [baseKey, "reset_password"],
+      mutationFn: (request: ResetPasswordRequest) =>
+        new ResetPassword(identityProvider, {
+          email: request.email,
+          code: request.code,
+          newPassword: request.newPassword,
         }).execute(),
     }),
 };

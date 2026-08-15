@@ -13,4 +13,12 @@ export class MockIdentityProvider implements IdentityProvider {
   public async verify(_email: string, _code: string): Promise<void> {}
 
   public async sendVerification(_email: string): Promise<void> {}
+
+  public async requestPasswordReset(_email: string): Promise<void> {}
+
+  public async resetPassword(
+    _email: string,
+    _code: string,
+    _newPassword: string,
+  ): Promise<void> {}
 }

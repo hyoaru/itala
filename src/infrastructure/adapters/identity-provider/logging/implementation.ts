@@ -65,4 +65,32 @@ export class LoggingIdentityProvider implements IdentityProvider {
       throw error;
     }
   }
+
+  public async requestPasswordReset(email: string): Promise<void> {
+    try {
+      logger.debug("Requesting password reset", { email });
+      const result = await this.inner.requestPasswordReset(email);
+      logger.info("Password reset requested", { email });
+      return result;
+    } catch (error) {
+      logger.error("Requesting password reset failed", { email });
+      throw error;
+    }
+  }
+
+  public async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<void> {
+    try {
+      logger.debug("Resetting password", { email });
+      const result = await this.inner.resetPassword(email, code, newPassword);
+      logger.info("Password reset successful", { email });
+      return result;
+    } catch (error) {
+      logger.error("Resetting password failed", { email });
+      throw error;
+    }
+  }
 }

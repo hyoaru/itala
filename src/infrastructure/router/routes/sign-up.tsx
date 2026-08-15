@@ -211,7 +211,7 @@ function RouteComponent() {
             }}
           </form.AppField>
 
-          <p className="text-muted text-start text-xs">
+          <p className="text-muted text-center text-sm">
             By continuing, you agree to Itala’s terms.
           </p>
 
