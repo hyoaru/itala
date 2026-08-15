@@ -1,6 +1,4 @@
-import { IdentityProviderError } from "@/application/ports/identity-provider";
-import { SignUp } from "@/application/use-cases";
-import { useDependencies } from "@/infrastructure/dependencies/context";
+import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
 import { passwordSchema } from "@/infrastructure/validators";
 import {
@@ -12,9 +10,9 @@ import {
   TextField,
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
-import { useState } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/sign-up")({
@@ -35,38 +33,30 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
-  const { useCaseBus, identityProvider } = useDependencies();
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const signUpMutation = useMutation(identityActions.signUp());
 
   const form = useAppForm({
     defaultValues: {
       email: "",
+      firstName: "",
+      lastName: "",
       password: "",
     },
     validators: {
       onChange: z.object({
         email: z.email(),
+        firstName: z.string().min(1).max(50),
+        lastName: z.string().min(1).max(100),
         password: passwordSchema,
       }),
     },
     onSubmit: async ({ value }) => {
-      setSubmitError(null);
-      try {
-        await useCaseBus.dispatch(
-          new SignUp(identityProvider, {
-            email: value.email,
-            firstName: "",
-            lastName: "",
-            password: value.password,
-          }),
-        );
-      } catch (error) {
-        if (error instanceof IdentityProviderError) {
-          setSubmitError("Unable to create your account. Please try again.");
-        } else {
-          setSubmitError("Something went wrong. Please try again.");
-        }
-      }
+      await signUpMutation.mutateAsync({
+        email: value.email,
+        firstName: value.firstName,
+        lastName: value.lastName,
+        password: value.password,
+      });
     },
   });
 
@@ -120,6 +110,48 @@ function RouteComponent() {
             }}
           </form.AppField>
 
+          <form.AppField name="firstName">
+            {(field) => {
+              const { isInvalid, errorMessage } = getFieldError(field);
+              return (
+                <field.TextField isInvalid={isInvalid}>
+                  <Label>First name</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    variant="secondary"
+                    placeholder="John"
+                  />
+                  <FieldError>{errorMessage}</FieldError>
+                </field.TextField>
+              );
+            }}
+          </form.AppField>
+
+          <form.AppField name="lastName">
+            {(field) => {
+              const { isInvalid, errorMessage } = getFieldError(field);
+              return (
+                <field.TextField isInvalid={isInvalid}>
+                  <Label>Last name</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    variant="secondary"
+                    placeholder="Doe"
+                  />
+                  <FieldError>{errorMessage}</FieldError>
+                </field.TextField>
+              );
+            }}
+          </form.AppField>
+
           <form.AppField name="password">
             {(field) => {
               const { isInvalid, errorMessage } = getFieldError(field);
@@ -145,8 +177,6 @@ function RouteComponent() {
           <p className="text-muted text-start text-xs">
             By continuing, you agree to Itala’s terms.
           </p>
-
-          {submitError && <p className="text-danger text-xs">{submitError}</p>}
 
           <form.AppForm>
             <form.Button type="submit" className="w-full">

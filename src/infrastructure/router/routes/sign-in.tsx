@@ -1,6 +1,4 @@
-import type { IdentityProviderInvalidCredentialsError } from "@/application/ports/identity-provider";
-import { SignIn } from "@/application/use-cases";
-import { useDependencies } from "@/infrastructure/dependencies/context";
+import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
 import {
   Button,
@@ -11,9 +9,9 @@ import {
   TextField,
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
-import { useState } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/sign-in")({
@@ -34,8 +32,7 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
-  const { useCaseBus, identityProvider } = useDependencies();
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const signInMutation = useMutation(identityActions.signIn());
 
   const form = useAppForm({
     defaultValues: {
@@ -49,24 +46,10 @@ function RouteComponent() {
       }),
     },
     onSubmit: async ({ value }) => {
-      setSubmitError(null);
-      try {
-        await useCaseBus.dispatch(
-          new SignIn(identityProvider, {
-            email: value.email,
-            password: value.password,
-          }),
-        );
-      } catch (error) {
-        if (
-          (error as IdentityProviderInvalidCredentialsError).name ===
-          "IdentityProviderError"
-        ) {
-          setSubmitError("Incorrect email or password.");
-        } else {
-          setSubmitError("Something went wrong. Please try again.");
-        }
-      }
+      await signInMutation.mutateAsync({
+        email: value.email,
+        password: value.password,
+      });
     },
   });
 
@@ -143,8 +126,6 @@ function RouteComponent() {
           <p className="text-muted text-end text-xs underline">
             Forgot password?
           </p>
-
-          {submitError && <p className="text-danger text-xs">{submitError}</p>}
 
           <form.AppForm>
             <form.Button type="submit" className="w-full">
