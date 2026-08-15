@@ -1,3 +1,9 @@
+import {
+  IdentityProviderEmailAlreadyExistsError,
+  IdentityProviderError,
+  IdentityProviderInvalidEmailError,
+  IdentityProviderInvalidPasswordError,
+} from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
 import { passwordSchema } from "@/infrastructure/validators";
@@ -67,10 +73,26 @@ function RouteComponent() {
           variant: "success",
         });
         navigate({ to: "/verify" });
-      } catch {
-        toast("An unexpected error has occured", {
-          variant: "danger",
-        });
+      } catch (error) {
+        if (error instanceof IdentityProviderEmailAlreadyExistsError) {
+          toast("An account with this email already exists", {
+            variant: "danger",
+          });
+        } else if (error instanceof IdentityProviderInvalidEmailError) {
+          toast("Please enter a valid email address", { variant: "danger" });
+        } else if (error instanceof IdentityProviderInvalidPasswordError) {
+          toast("Password does not meet the required strength", {
+            variant: "danger",
+          });
+        } else if (error instanceof IdentityProviderError) {
+          toast(`An unexpected error has occured: ${error.message}`, {
+            variant: "danger",
+          });
+        } else {
+          toast("An unexpected error has occured", {
+            variant: "danger",
+          });
+        }
       }
     },
   });

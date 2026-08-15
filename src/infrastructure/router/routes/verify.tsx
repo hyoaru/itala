@@ -1,3 +1,9 @@
+import {
+  IdentityProviderCodeDeliveryFailureError,
+  IdentityProviderError,
+  IdentityProviderInvalidCodeError,
+  IdentityProviderUserNotFoundError,
+} from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions";
 import { getFieldError } from "@/infrastructure/forms";
 import { Button, Form, InputOTP, toast } from "@heroui/react";
@@ -51,10 +57,20 @@ function RouteComponent() {
         form.reset();
         toast("Email verified successfully!", { variant: "success" });
         navigate({ to: "/" });
-      } catch {
-        toast("An unexpected error has occured", {
-          variant: "danger",
-        });
+      } catch (error) {
+        if (error instanceof IdentityProviderInvalidCodeError) {
+          toast("Invalid or expired code. Please try again.", {
+            variant: "danger",
+          });
+        } else if (error instanceof IdentityProviderError) {
+          toast(`An unexpected error has occured: ${error.message}`, {
+            variant: "danger",
+          });
+        } else {
+          toast("An unexpected error has occured", {
+            variant: "danger",
+          });
+        }
       }
     },
   });
@@ -65,10 +81,22 @@ function RouteComponent() {
         email: email,
       });
       toast("Email verification sent", { variant: "success" });
-    } catch {
-      toast("An unexpected error has occured", {
-        variant: "danger",
-      });
+    } catch (error) {
+      if (error instanceof IdentityProviderCodeDeliveryFailureError) {
+        toast("Could not resend the code. Please try again.", {
+          variant: "danger",
+        });
+      } else if (error instanceof IdentityProviderUserNotFoundError) {
+        toast("No account found for this email", { variant: "danger" });
+      } else if (error instanceof IdentityProviderError) {
+        toast(`An unexpected error has occured: ${error.message}`, {
+          variant: "danger",
+        });
+      } else {
+        toast("An unexpected error has occured", {
+          variant: "danger",
+        });
+      }
     }
   };
 

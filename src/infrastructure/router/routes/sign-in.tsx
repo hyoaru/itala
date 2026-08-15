@@ -1,6 +1,8 @@
 import {
   IdentityProviderError,
   IdentityProviderInvalidCredentialsError,
+  IdentityProviderPasswordResetRequiredError,
+  IdentityProviderUserNotConfirmedError,
 } from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
@@ -63,6 +65,15 @@ function RouteComponent() {
       } catch (error) {
         if (error instanceof IdentityProviderInvalidCredentialsError) {
           toast("Incorrect email or password", { variant: "danger" });
+        } else if (error instanceof IdentityProviderUserNotConfirmedError) {
+          sessionStorage.setItem("VERIFICATION_EMAIL", value.email);
+          toast("Please verify your email before signing in", {
+            variant: "danger",
+          });
+        } else if (error instanceof IdentityProviderPasswordResetRequiredError) {
+          toast("A password reset is required for this account", {
+            variant: "danger",
+          });
         } else if (error instanceof IdentityProviderError) {
           toast(`An unexpected error has occured: ${error.message}`, {
             variant: "danger",
