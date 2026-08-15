@@ -20,4 +20,8 @@ export class DecoratedIdentityProvider implements IdentityProvider {
   public async signIn(email: string, password: string): Promise<void> {
     return await this.inner.signIn(email, password);
   }
+
+  public async verify(code: string): Promise<void> {
+    return await this.inner.verify(code);
+  }
 }

@@ -1,8 +1,10 @@
 import {
   SignIn,
   SignUp,
+  Verify,
   type SignInRequest,
   type SignUpRequest,
+  type VerifyRequest,
 } from "@/application/use-cases";
 import { mutationOptions } from "@tanstack/react-query";
 import {
@@ -36,5 +38,11 @@ export const identityActions = {
           lastName: request.lastName,
           password: request.password,
         }).execute(),
+    }),
+  verify: () =>
+    mutationOptions({
+      mutationKey: [baseKey, "verify"],
+      mutationFn: (request: VerifyRequest) =>
+        new Verify(identityProvider, { code: request.code }).execute(),
     }),
 };

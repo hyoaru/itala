@@ -48,4 +48,8 @@ export class CognitoIdentityProvider implements IdentityProvider {
       }),
     );
   }
+
+  public async verify(_code: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }

@@ -9,4 +9,6 @@ export class MockIdentityProvider implements IdentityProvider {
   ): Promise<void> {}
 
   public async signIn(_email: string, _password: string): Promise<void> {}
+
+  public async verify(_code: string): Promise<void> {}
 }

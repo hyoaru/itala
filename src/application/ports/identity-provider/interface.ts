@@ -7,4 +7,6 @@ export interface IdentityProvider {
   ): Promise<void>;
 
   signIn(email: string, password: string): Promise<void>;
+
+  verify(code: string): Promise<void>;
 }
