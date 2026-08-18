@@ -1,7 +1,15 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { useState } from "react";
 import { router } from "./router";
+import {
+  AuthenticationSessionProvider,
+  useAuthenticationSessionContext,
+} from "./contexts/authentication-session";
 
 export default function App() {
   const [queryClient] = useState(
@@ -18,7 +26,17 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} context={{ queryClient }} />
+      <AuthenticationSessionProvider>
+        <InnerApp />
+      </AuthenticationSessionProvider>
     </QueryClientProvider>
+  );
+}
+
+function InnerApp() {
+  const authState = useAuthenticationSessionContext();
+  const queryClient = useQueryClient();
+  return (
+    <RouterProvider router={router} context={{ queryClient, authState }} />
   );
 }
