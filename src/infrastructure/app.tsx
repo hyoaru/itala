@@ -5,11 +5,12 @@ import {
 } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { useState } from "react";
-import { router } from "./router";
+import { Initializing } from "./components/defaults";
 import {
   AuthenticationSessionProvider,
   useAuthenticationSessionContext,
 } from "./contexts/authentication-session";
+import { router } from "./router";
 
 export default function App() {
   const [queryClient] = useState(
@@ -34,9 +35,14 @@ export default function App() {
 }
 
 function InnerApp() {
-  const authState = useAuthenticationSessionContext();
   const queryClient = useQueryClient();
+  const authenticationSession = useAuthenticationSessionContext();
+  if (authenticationSession.isLoading) return <Initializing />;
+
   return (
-    <RouterProvider router={router} context={{ queryClient, authState }} />
+    <RouterProvider
+      router={router}
+      context={{ queryClient, authenticationSession }}
+    />
   );
 }

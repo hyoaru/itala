@@ -18,11 +18,21 @@ import {
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/sign-up")({
+  beforeLoad: ({ context }) => {
+    if (context.authenticationSession.isAuthenticated) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: RouteComponent,
 });
 

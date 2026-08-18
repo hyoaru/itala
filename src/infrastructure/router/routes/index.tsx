@@ -1,7 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { NotebookPen } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: ({ context }) => {
+    if (context.authenticationSession.isAuthenticated) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: RouteComponent,
 });
 

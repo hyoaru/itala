@@ -6,6 +6,10 @@ export const router = createRouter({
   defaultPreload: "intent",
   scrollRestoration: true,
   defaultPreloadStaleTime: 0,
+  context: {
+    queryClient: undefined!,
+    authenticationSession: undefined!,
+  },
 });
 
 declare module "@tanstack/react-router" {

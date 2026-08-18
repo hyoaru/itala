@@ -5,6 +5,7 @@ import {
   IdentityProviderUserNotVerifiedError,
 } from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
+import { useAuthenticationSessionContext } from "@/infrastructure/contexts/authentication-session";
 import { getFieldError } from "@/infrastructure/forms";
 import {
   Button,
@@ -17,11 +18,21 @@ import {
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/sign-in")({
+  beforeLoad: ({ context }) => {
+    if (context.authenticationSession.isAuthenticated) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: RouteComponent,
 });
 
@@ -39,6 +50,7 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
+  const { setSession } = useAuthenticationSessionContext();
   const navigate = useNavigate();
   const signInMutation = useMutation(identityActions.signIn());
 
@@ -55,14 +67,16 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await signInMutation.mutateAsync({
+        const session = await signInMutation.mutateAsync({
           email: value.email,
           password: value.password,
         });
 
+        setSession(session);
         form.reset();
 
         toast("Glad to have you back", { variant: "success" });
+        navigate({ to: "/dashboard" });
       } catch (error) {
         if (error instanceof IdentityProviderInvalidCredentialsError) {
           toast("Incorrect email or password", { variant: "danger" });
