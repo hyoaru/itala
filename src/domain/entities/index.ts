@@ -1,1 +1,1 @@
-export * from "./session";
+export * from "./authenticated-session";

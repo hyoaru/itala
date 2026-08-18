@@ -1,3 +1,5 @@
+import type { AuthenticatedSession } from "@/domain/entities";
+
 export interface IdentityProvider {
   signUp(
     email: string,
@@ -6,7 +8,7 @@ export interface IdentityProvider {
     password: string,
   ): Promise<void>;
 
-  signIn(email: string, password: string): Promise<void>;
+  signIn(email: string, password: string): Promise<AuthenticatedSession>;
 
   verify(email: string, code: string): Promise<void>;
 

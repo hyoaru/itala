@@ -1,4 +1,4 @@
-export type Session = {
+export type AuthenticatedSession = {
   accessToken: string;
   idToken: string;
   refreshToken: string;

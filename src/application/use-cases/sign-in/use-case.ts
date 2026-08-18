@@ -1,8 +1,9 @@
 import type { IdentityProvider } from "@/application/ports/identity-provider";
+import type { AuthenticatedSession } from "@/domain/entities";
 import type { UseCase } from "../interface";
 import type { SignInRequest } from "./request";
 
-export class SignIn implements UseCase<void> {
+export class SignIn implements UseCase<AuthenticatedSession> {
   private request: SignInRequest;
   private idp: IdentityProvider;
 
@@ -11,7 +12,7 @@ export class SignIn implements UseCase<void> {
     this.idp = idp;
   }
 
-  public async execute(): Promise<void> {
-    await this.idp.signIn(this.request.email, this.request.password);
+  public async execute(): Promise<AuthenticatedSession> {
+    return await this.idp.signIn(this.request.email, this.request.password);
   }
 }
