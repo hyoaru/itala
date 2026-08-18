@@ -62,9 +62,8 @@ function RouteComponent() {
 
         form.reset();
 
-        toast("Glad to have you back, [Name]", { variant: "success" });
+        toast("Glad to have you back", { variant: "success" });
       } catch (error) {
-        console.log(error instanceof IdentityProviderUserNotVerifiedError);
         if (error instanceof IdentityProviderInvalidCredentialsError) {
           toast("Incorrect email or password", { variant: "danger" });
         } else if (error instanceof IdentityProviderUserNotVerifiedError) {

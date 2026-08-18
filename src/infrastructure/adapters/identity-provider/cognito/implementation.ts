@@ -11,6 +11,7 @@ import {
   IdentityProviderUserNotFoundError,
   type IdentityProvider,
 } from "@/application/ports/identity-provider";
+import type { AuthenticatedSession } from "@/domain/entities";
 import {
   AliasExistsException,
   CodeDeliveryFailureException,
@@ -92,9 +93,12 @@ export class CognitoIdentityProvider implements IdentityProvider {
     }
   }
 
-  public async signIn(email: string, password: string): Promise<void> {
+  public async signIn(
+    email: string,
+    password: string,
+  ): Promise<AuthenticatedSession> {
     try {
-      await this.cognitoClient.send(
+      const result = await this.cognitoClient.send(
         new InitiateAuthCommand({
           ClientId: this.cognitoClientId,
           AuthFlow: "USER_PASSWORD_AUTH",
@@ -104,6 +108,16 @@ export class CognitoIdentityProvider implements IdentityProvider {
           },
         }),
       );
+
+      const accessToken = result?.AuthenticationResult?.AccessToken;
+      const idToken = result?.AuthenticationResult?.IdToken;
+      const refreshToken = result?.AuthenticationResult?.RefreshToken;
+
+      if (!accessToken || !idToken || !refreshToken) {
+        throw new IdentityProviderError("Unexpected response from Cognito");
+      }
+
+      return { accessToken, idToken, refreshToken };
     } catch (error) {
       if (error instanceof IdentityProviderError) {
         throw error;

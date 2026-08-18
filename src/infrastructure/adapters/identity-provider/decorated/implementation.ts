@@ -1,5 +1,6 @@
 import type { IdentityProvider } from "@/application/ports/identity-provider";
 import { LoggingIdentityProvider } from "../logging";
+import type { AuthenticatedSession } from "@/domain/entities";
 
 export class DecoratedIdentityProvider implements IdentityProvider {
   private inner: IdentityProvider;
@@ -17,7 +18,10 @@ export class DecoratedIdentityProvider implements IdentityProvider {
     return await this.inner.signUp(email, firstName, lastName, password);
   }
 
-  public async signIn(email: string, password: string): Promise<void> {
+  public async signIn(
+    email: string,
+    password: string,
+  ): Promise<AuthenticatedSession> {
     return await this.inner.signIn(email, password);
   }
 

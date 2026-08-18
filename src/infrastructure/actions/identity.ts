@@ -28,56 +28,85 @@ export const identityActions = {
   signIn: () =>
     mutationOptions({
       mutationKey: [baseKey, "sign_in"],
-      mutationFn: (request: SignInRequest) =>
-        new SignIn(identityProvider, {
+      mutationFn: async (
+        request: SignInRequest,
+      ): ReturnType<InstanceType<typeof SignIn>["execute"]> => {
+        const authenticatedSession = await new SignIn(identityProvider, {
           email: request.email,
           password: request.password,
-        }).execute(),
+        }).execute();
+
+        localStorage.setItem("ID_TOKEN", authenticatedSession.idToken);
+        localStorage.setItem("ACCESS_TOKEN", authenticatedSession.accessToken);
+        localStorage.setItem(
+          "REFRESH_TOKEN",
+          authenticatedSession.refreshToken,
+        );
+
+        return authenticatedSession;
+      },
     }),
   signUp: () =>
     mutationOptions({
       mutationKey: [baseKey, "sign_up"],
-      mutationFn: (request: SignUpRequest) =>
-        new SignUp(identityProvider, {
+      mutationFn: (
+        request: SignUpRequest,
+      ): ReturnType<InstanceType<typeof SignUp>["execute"]> => {
+        return new SignUp(identityProvider, {
           email: request.email,
           firstName: request.firstName,
           lastName: request.lastName,
           password: request.password,
-        }).execute(),
+        }).execute();
+      },
     }),
   verifyAccount: () =>
     mutationOptions({
       mutationKey: [baseKey, "verify"],
-      mutationFn: (request: VerifyAccountRequest) =>
-        new VerifyAccount(identityProvider, {
+      mutationFn: (
+        request: VerifyAccountRequest,
+      ): ReturnType<InstanceType<typeof VerifyAccount>["execute"]> => {
+        return new VerifyAccount(identityProvider, {
           email: request.email,
           code: request.code,
-        }).execute(),
+        }).execute();
+      },
     }),
   sendAccountVerification: () =>
     mutationOptions({
       mutationKey: [baseKey, "send_verification"],
-      mutationFn: (request: SendAccountVerificationRequest) =>
-        new SendAccountVerification(identityProvider, {
+      mutationFn: (
+        request: SendAccountVerificationRequest,
+      ): ReturnType<
+        InstanceType<typeof SendAccountVerification>["execute"]
+      > => {
+        return new SendAccountVerification(identityProvider, {
           email: request.email,
-        }).execute(),
+        }).execute();
+      },
     }),
   sendPasswordReset: () =>
     mutationOptions({
       mutationKey: [baseKey, "request_password_reset"],
-      mutationFn: (request: SendPasswordResetRequest) =>
-        new SendPasswordReset(identityProvider, {
+      mutationFn: (
+        request: SendPasswordResetRequest,
+      ): ReturnType<InstanceType<typeof SendPasswordReset>["execute"]> => {
+        return new SendPasswordReset(identityProvider, {
           email: request.email,
-        }).execute(),
+        }).execute();
+      },
     }),
   resetPassword: () =>
     mutationOptions({
       mutationKey: [baseKey, "reset_password"],
-      mutationFn: (request: ResetPasswordRequest) =>
-        new ResetPassword(identityProvider, {
+      mutationFn: (
+        request: ResetPasswordRequest,
+      ): ReturnType<InstanceType<typeof ResetPassword>["execute"]> => {
+        return new ResetPassword(identityProvider, {
           email: request.email,
           code: request.code,
           newPassword: request.newPassword,
-        }).execute(),
+        }).execute();
+      },
     }),
 };
