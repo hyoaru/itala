@@ -1,5 +1,5 @@
 import type { IdentityProvider } from "@/application/ports/identity-provider";
-import type { UseCase } from "../../interface";
+import type { UseCase } from "../interface";
 import type { SignInRequest } from "./request";
 
 export class SignIn implements UseCase<void> {

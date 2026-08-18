@@ -11,7 +11,7 @@ import {
   type SignInRequest,
   type SignUpRequest,
   type VerifyRequest,
-} from "@/application/use-cases/identity";
+} from "@/application/use-cases";
 import { mutationOptions } from "@tanstack/react-query";
 import {
   CognitoIdentityProvider,
