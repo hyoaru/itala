@@ -1,4 +1,4 @@
-import type { User } from "@/domain/entities";
+import { User } from "@/domain/entities";
 import { jwtDecode } from "jwt-decode";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -45,12 +45,14 @@ export function AuthenticationSessionProvider({
         return;
       }
 
-      setUser({
-        id: idClaims.sub,
-        email: idClaims.email,
-        firstName: idClaims["custom:first_name"],
-        lastName: idClaims["custom:last_name"],
-      });
+      setUser(
+        new User({
+          id: idClaims.sub,
+          email: idClaims.email,
+          firstName: idClaims["custom:first_name"],
+          lastName: idClaims["custom:last_name"],
+        }),
+      );
     } catch {
       setUser(null);
     } finally {

@@ -11,7 +11,7 @@ import {
   IdentityProviderUserNotFoundError,
   type IdentityProvider,
 } from "@/application/ports/identity-provider";
-import type { AuthenticatedSession } from "@/domain/entities";
+import { AuthenticatedSession } from "@/domain/entities";
 import {
   AliasExistsException,
   CodeDeliveryFailureException,
@@ -117,7 +117,7 @@ export class CognitoIdentityProvider implements IdentityProvider {
         throw new IdentityProviderError("Unexpected response from Cognito");
       }
 
-      return { accessToken, idToken, refreshToken };
+      return new AuthenticatedSession({ accessToken, idToken, refreshToken });
     } catch (error) {
       if (error instanceof IdentityProviderError) {
         throw error;
