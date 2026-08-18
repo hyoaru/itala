@@ -1,16 +1,16 @@
 import {
-  RequestPasswordReset,
   ResetPassword,
-  SendVerification,
+  SendAccountVerification,
+  SendPasswordReset,
   SignIn,
   SignUp,
-  Verify,
-  type RequestPasswordResetRequest,
+  VerifyAccount,
   type ResetPasswordRequest,
-  type SendVerificationRequest,
+  type SendAccountVerificationRequest,
+  type SendPasswordResetRequest,
   type SignInRequest,
   type SignUpRequest,
-  type VerifyRequest,
+  type VerifyAccountRequest,
 } from "@/application/use-cases";
 import { mutationOptions } from "@tanstack/react-query";
 import {
@@ -45,28 +45,28 @@ export const identityActions = {
           password: request.password,
         }).execute(),
     }),
-  verify: () =>
+  verifyAccount: () =>
     mutationOptions({
       mutationKey: [baseKey, "verify"],
-      mutationFn: (request: VerifyRequest) =>
-        new Verify(identityProvider, {
+      mutationFn: (request: VerifyAccountRequest) =>
+        new VerifyAccount(identityProvider, {
           email: request.email,
           code: request.code,
         }).execute(),
     }),
-  sendVerification: () =>
+  sendAccountVerification: () =>
     mutationOptions({
       mutationKey: [baseKey, "send_verification"],
-      mutationFn: (request: SendVerificationRequest) =>
-        new SendVerification(identityProvider, {
+      mutationFn: (request: SendAccountVerificationRequest) =>
+        new SendAccountVerification(identityProvider, {
           email: request.email,
         }).execute(),
     }),
-  requestPasswordReset: () =>
+  sendPasswordReset: () =>
     mutationOptions({
       mutationKey: [baseKey, "request_password_reset"],
-      mutationFn: (request: RequestPasswordResetRequest) =>
-        new RequestPasswordReset(identityProvider, {
+      mutationFn: (request: SendPasswordResetRequest) =>
+        new SendPasswordReset(identityProvider, {
           email: request.email,
         }).execute(),
     }),

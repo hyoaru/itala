@@ -39,8 +39,8 @@ const { useAppForm } = createFormHook({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const requestPasswordResetMutation = useMutation(
-    identityActions.requestPasswordReset(),
+  const sendPasswordResetMutation = useMutation(
+    identityActions.sendPasswordReset(),
   );
 
   const form = useAppForm({
@@ -54,7 +54,7 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await requestPasswordResetMutation.mutateAsync({
+        await sendPasswordResetMutation.mutateAsync({
           email: value.email,
         });
 

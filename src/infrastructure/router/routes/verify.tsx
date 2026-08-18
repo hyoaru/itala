@@ -6,24 +6,23 @@ import {
 } from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions";
 import { getFieldError } from "@/infrastructure/forms";
-import {
-  Button,
-  FieldError,
-  Form,
-  Input,
-  InputOTP,
-  Label,
-  TextField,
-  toast,
-} from "@heroui/react";
+import { Button, Form, InputOTP, TextField, toast } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
-import { useState } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/verify")({
+  beforeLoad: () => {
+    const email = sessionStorage.getItem("VERIFICATION_EMAIL");
+    if (!email) throw redirect({ to: "/sign-in" });
+  },
   component: RouteComponent,
 });
 
@@ -43,28 +42,11 @@ const { useAppForm } = createFormHook({
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(
-    () => sessionStorage.getItem("VERIFICATION_EMAIL") ?? "",
+  const email = sessionStorage.getItem("VERIFICATION_EMAIL") ?? "";
+  const verifyAccountMutation = useMutation(identityActions.verifyAccount());
+  const sendAccountVerificationMutation = useMutation(
+    identityActions.sendAccountVerification(),
   );
-  const verifyMutation = useMutation(identityActions.verify());
-  const sendVerificationMutation = useMutation(
-    identityActions.sendVerification(),
-  );
-
-  const emailForm = useAppForm({
-    defaultValues: {
-      email: "",
-    },
-    validators: {
-      onChange: z.object({
-        email: z.email(),
-      }),
-    },
-    onSubmit: async ({ value }) => {
-      sessionStorage.setItem("VERIFICATION_EMAIL", value.email);
-      setEmail(value.email);
-    },
-  });
 
   const form = useAppForm({
     defaultValues: {
@@ -77,7 +59,7 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       try {
-        await verifyMutation.mutateAsync({
+        await verifyAccountMutation.mutateAsync({
           email: email,
           code: value.code,
         });
@@ -106,7 +88,7 @@ function RouteComponent() {
 
   const onResend = async () => {
     try {
-      await sendVerificationMutation.mutateAsync({
+      await sendAccountVerificationMutation.mutateAsync({
         email: email,
       });
       toast("Email verification sent", { variant: "success" });
@@ -147,105 +129,62 @@ function RouteComponent() {
           <p className="font-heading text-2xl font-medium">
             Confirm your email
           </p>
-          {email ? (
-            <p className="text-muted text-center text-sm">
-              We sent a 6-digit confirmation code to {email}
-            </p>
-          ) : (
-            <p className="text-muted text-sm">
-              Enter the email address you registered with to receive a code.
-            </p>
-          )}
+          <p className="text-muted text-center text-sm">
+            We sent a 6-digit confirmation code to {email}
+          </p>
         </div>
-        {email ? (
-          <Form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              form.handleSubmit(e);
-            }}
-          >
-            <form.AppField name="code">
-              {(field) => {
-                const { isInvalid } = getFieldError(field);
-                return (
-                  <div className="flex flex-col items-center gap-2">
-                    <field.InputOTP
-                      maxLength={6}
-                      isInvalid={isInvalid}
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e)}
-                      variant="secondary"
-                      className="mx-auto w-fit"
+        <Form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(e);
+          }}
+        >
+          <form.AppField name="code">
+            {(field) => {
+              const { isInvalid } = getFieldError(field);
+              return (
+                <div className="flex flex-col items-center gap-2">
+                  <field.InputOTP
+                    maxLength={6}
+                    isInvalid={isInvalid}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e)}
+                    variant="secondary"
+                    className="mx-auto w-fit"
+                  >
+                    <InputOTP.Group>
+                      <InputOTP.Slot index={0} />
+                      <InputOTP.Slot index={1} />
+                      <InputOTP.Slot index={2} />
+                    </InputOTP.Group>
+                    <InputOTP.Separator />
+                    <InputOTP.Group>
+                      <InputOTP.Slot index={3} />
+                      <InputOTP.Slot index={4} />
+                      <InputOTP.Slot index={5} />
+                    </InputOTP.Group>
+                  </field.InputOTP>
+                  <p className="text-muted text-sm">
+                    Didn't receive a code?{" "}
+                    <button
+                      onClick={onResend}
+                      className="text-foreground font-medium underline"
                     >
-                      <InputOTP.Group>
-                        <InputOTP.Slot index={0} />
-                        <InputOTP.Slot index={1} />
-                        <InputOTP.Slot index={2} />
-                      </InputOTP.Group>
-                      <InputOTP.Separator />
-                      <InputOTP.Group>
-                        <InputOTP.Slot index={3} />
-                        <InputOTP.Slot index={4} />
-                        <InputOTP.Slot index={5} />
-                      </InputOTP.Group>
-                    </field.InputOTP>
-                    <p className="text-muted text-sm">
-                      Didn't receive a code?{" "}
-                      <button
-                        onClick={onResend}
-                        className="text-foreground font-medium underline"
-                      >
-                        Resend
-                      </button>
-                    </p>
-                  </div>
-                );
-              }}
-            </form.AppField>
-
-            <form.AppForm>
-              <form.Button type="submit" className="w-full">
-                Verify account
-              </form.Button>
-            </form.AppForm>
-          </Form>
-        ) : (
-          <Form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              emailForm.handleSubmit(e);
+                      Resend
+                    </button>
+                  </p>
+                </div>
+              );
             }}
-          >
-            <emailForm.AppField name="email">
-              {(field) => {
-                const { isInvalid, errorMessage } = getFieldError(field);
-                return (
-                  <field.TextField isInvalid={isInvalid}>
-                    <Label>Email address</Label>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      variant="secondary"
-                      placeholder="John.doe@email.com"
-                    />
-                    <FieldError>{errorMessage}</FieldError>
-                  </field.TextField>
-                );
-              }}
-            </emailForm.AppField>
+          </form.AppField>
 
-            <emailForm.AppForm>
-              <emailForm.Button type="submit" className="w-full">
-                Send code
-              </emailForm.Button>
-            </emailForm.AppForm>
-          </Form>
-        )}
+          <form.AppForm>
+            <form.Button type="submit" className="w-full">
+              Verify account
+            </form.Button>
+          </form.AppForm>
+        </Form>
       </div>
     </>
   );

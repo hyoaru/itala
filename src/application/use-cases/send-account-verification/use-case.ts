@@ -1,12 +1,15 @@
 import type { IdentityProvider } from "@/application/ports/identity-provider";
 import type { UseCase } from "../interface";
-import type { SendVerificationRequest } from "./request";
+import type { SendAccountVerificationRequest } from "./request";
 
-export class SendVerification implements UseCase<void> {
-  private request: SendVerificationRequest;
+export class SendAccountVerification implements UseCase<void> {
+  private request: SendAccountVerificationRequest;
   private idp: IdentityProvider;
 
-  public constructor(idp: IdentityProvider, request: SendVerificationRequest) {
+  public constructor(
+    idp: IdentityProvider,
+    request: SendAccountVerificationRequest,
+  ) {
     this.request = request;
     this.idp = idp;
   }
