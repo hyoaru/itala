@@ -2,7 +2,7 @@ import {
   IdentityProviderError,
   IdentityProviderInvalidCredentialsError,
   IdentityProviderPasswordResetRequiredError,
-  IdentityProviderUserNotConfirmedError,
+  IdentityProviderUserNotVerifiedError,
 } from "@/application/ports/identity-provider";
 import { identityActions } from "@/infrastructure/actions/identity";
 import { getFieldError } from "@/infrastructure/forms";
@@ -17,7 +17,7 @@ import {
 } from "@heroui/react";
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, NotebookPen } from "lucide-react";
 import { z } from "zod";
 
@@ -39,6 +39,7 @@ const { useAppForm } = createFormHook({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const signInMutation = useMutation(identityActions.signIn());
 
   const form = useAppForm({
@@ -63,13 +64,15 @@ function RouteComponent() {
 
         toast("Glad to have you back, [Name]", { variant: "success" });
       } catch (error) {
+        console.log(error instanceof IdentityProviderUserNotVerifiedError);
         if (error instanceof IdentityProviderInvalidCredentialsError) {
           toast("Incorrect email or password", { variant: "danger" });
-        } else if (error instanceof IdentityProviderUserNotConfirmedError) {
+        } else if (error instanceof IdentityProviderUserNotVerifiedError) {
           sessionStorage.setItem("VERIFICATION_EMAIL", value.email);
           toast("Please verify your email before signing in", {
             variant: "danger",
           });
+          navigate({ to: "/verify" });
         } else if (
           error instanceof IdentityProviderPasswordResetRequiredError
         ) {

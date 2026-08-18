@@ -4,5 +4,6 @@ export class IdentityProviderInvalidCredentialsError extends IdentityProviderErr
   constructor(email: string, options?: ErrorOptions) {
     super(`Invalid credentials for ${email}`, options);
     this.name = "IdentityProviderInvalidCredentialsError";
+    Object.setPrototypeOf(this, IdentityProviderInvalidCredentialsError.prototype);
   }
 }

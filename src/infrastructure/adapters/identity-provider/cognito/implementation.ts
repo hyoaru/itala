@@ -7,7 +7,7 @@ import {
   IdentityProviderInvalidEmailError,
   IdentityProviderInvalidPasswordError,
   IdentityProviderPasswordResetRequiredError,
-  IdentityProviderUserNotConfirmedError,
+  IdentityProviderUserNotVerifiedError,
   IdentityProviderUserNotFoundError,
   type IdentityProvider,
 } from "@/application/ports/identity-provider";
@@ -117,7 +117,7 @@ export class CognitoIdentityProvider implements IdentityProvider {
         });
       }
       if (error instanceof UserNotConfirmedException) {
-        throw new IdentityProviderUserNotConfirmedError(email, {
+        throw new IdentityProviderUserNotVerifiedError(email, {
           cause: error,
         });
       }

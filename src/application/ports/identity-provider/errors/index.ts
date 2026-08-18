@@ -1,6 +1,6 @@
 export * from "./error";
 export * from "./invalid-credentials-error";
-export * from "./user-not-confirmed-error";
+export * from "./user-not-verified-error";
 export * from "./password-reset-required-error";
 export * from "./email-already-exists-error";
 export * from "./invalid-password-error";

@@ -14,14 +14,14 @@ import {
 } from "@/application/use-cases/identity";
 import { mutationOptions } from "@tanstack/react-query";
 import {
+  CognitoIdentityProvider,
   DecoratedIdentityProvider,
-  MockIdentityProvider,
 } from "../adapters/identity-provider";
 
 const baseKey = "identity";
 
 const identityProvider = new DecoratedIdentityProvider(
-  new MockIdentityProvider(),
+  new CognitoIdentityProvider(),
 );
 
 export const identityActions = {

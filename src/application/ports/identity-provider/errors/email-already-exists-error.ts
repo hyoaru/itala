@@ -4,5 +4,6 @@ export class IdentityProviderEmailAlreadyExistsError extends IdentityProviderErr
   constructor(email: string, options?: ErrorOptions) {
     super(`An account with ${email} already exists`, options);
     this.name = "IdentityProviderEmailAlreadyExistsError";
+    Object.setPrototypeOf(this, IdentityProviderEmailAlreadyExistsError.prototype);
   }
 }

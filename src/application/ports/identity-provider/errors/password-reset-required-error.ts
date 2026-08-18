@@ -4,5 +4,6 @@ export class IdentityProviderPasswordResetRequiredError extends IdentityProvider
   constructor(email: string, options?: ErrorOptions) {
     super(`Password reset required for ${email}`, options);
     this.name = "IdentityProviderPasswordResetRequiredError";
+    Object.setPrototypeOf(this, IdentityProviderPasswordResetRequiredError.prototype);
   }
 }

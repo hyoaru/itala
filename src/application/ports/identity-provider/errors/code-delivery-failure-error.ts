@@ -4,5 +4,6 @@ export class IdentityProviderCodeDeliveryFailureError extends IdentityProviderEr
   constructor(email: string, options?: ErrorOptions) {
     super(`Could not deliver verification code to ${email}`, options);
     this.name = "IdentityProviderCodeDeliveryFailureError";
+    Object.setPrototypeOf(this, IdentityProviderCodeDeliveryFailureError.prototype);
   }
 }
